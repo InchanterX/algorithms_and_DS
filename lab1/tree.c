@@ -17,11 +17,17 @@ typedef struct Node {
 } Node;
 
 void init(Node** Tree) {
+	/* Tree initialization */
 	*Tree = NULL;
 }
 
 Node* create_node(int key, int value) {
+	/* Node creation with allocation of memory for it */
 	Node* new_node = (Node*)malloc(sizeof(Node));
+
+	// In case of memory allocation failure
+	if (new_node == NULL) return NULL;
+
 	if (new_node) {
 		new_node->key = key;
 		new_node->value = value;
@@ -32,21 +38,25 @@ Node* create_node(int key, int value) {
 }
 
 void delete_node(Node* element) {
+	/* Node delition */
 	free(element);
 }
 
 int is_empty(Node* root) {
+	/* Check the tree for being empty */
 	return (root == NULL);
 }
 
 void clear_input_buffer(void) {
+	/* Consume all extra inputed symbols */
 	int c;
 	while ((c = getchar()) != '\n' && c != EOF);
 }
 
 Status destroy(Node** root) {
+	/* Recursivly delete all thhe tree */
 	if (*root == NULL) {
-		return DO_NOT_EXIST;
+		return SUCCESS;
 	}
 	destroy(&(*root)->left);
 	destroy(&(*root)->right);
@@ -56,6 +66,7 @@ Status destroy(Node** root) {
 }
 
 Status add_node(Node** root, int key, int value) {
+	/* Add node to the tree to a proper position */
 	if (*root == NULL) {
 		*root = create_node(key, value);
 		return (*root) ? SUCCESS : MEMORY_ERROR;
@@ -69,20 +80,18 @@ Status add_node(Node** root, int key, int value) {
                 		current_node = current_node->left;
             		} else {
                 		Node* new_node = create_node(key, value);
-                		if (!new_node)
-    					return MEMORY_ERROR;
-				current_node->left = new_node;
-				break;
+                		if (!new_node) return MEMORY_ERROR;
+						current_node->left = new_node;
+						break;
             		}
         	} else {
             		if (current_node->right) {
                 		current_node = current_node->right;
             		} else {
                 		Node* new_node = create_node(key, value);
-				current_node-> right = new_node;
-				if (!new_node)
-    					return MEMORY_ERROR;
-				break;
+						if (!new_node) return MEMORY_ERROR;
+						current_node-> right = new_node;
+						break;
             		}
         	}
 	}
@@ -90,6 +99,7 @@ Status add_node(Node** root, int key, int value) {
 }
 
 Status remove_node(Node** root, int key) {
+	/* Remove node from the tree, saving the right sructure */
 	if (*root == NULL) {
 		return DO_NOT_EXIST;
 	}
@@ -117,6 +127,19 @@ Status remove_node(Node** root, int key) {
 			}
 		} else {
 			return INCORRECT_KEY;
+		}
+	}
+
+	if (previous_node == NULL) {
+		if (!(current_node->left || current_node->right)) {
+			delete_node(current_node);
+			*root = NULL;
+			return SUCCESS;
+		} else if ((current_node->left == NULL) != (current_node->right == NULL)) {
+			Node* child = current_node->left ? current_node->left : current_node->right;
+		    delete_node(current_node);
+		    *root = child;
+			return SUCCESS;
 		}
 	}
 
@@ -162,6 +185,7 @@ Status remove_node(Node** root, int key) {
 }
 
 Status display_node(Node* root, int key) {
+	/* Display one specific node by key */
 	if (root == NULL) {
 		return DO_NOT_EXIST;
 	}
@@ -197,14 +221,14 @@ Status display_node(Node* root, int key) {
 }
 
 int display(Node* root, unsigned int indent) {
+	/*Display tree elements*/
 	if (root == NULL) {
-		printf("The tree is empty. Nothing has changed.\n");
 		return SUCCESS;
 	}
 	for (int i = 0; i < indent; i++) {
 		printf("   |");
 	}
-	printf("\b%d (%d)\n", root->key, root->value);
+	printf("%d (%d)\n", root->key, root->value);
 	if (root->left) {
 		display(root->left, indent + 1);
 	}
@@ -215,8 +239,9 @@ int display(Node* root, unsigned int indent) {
 }
 
 int depth_of_min(Node* root) {
+	/* Find the depth of the least element of the tree */
 	if (root == NULL) {
-		return 0;
+		return -1;
 	}
 	int depth = 0;
 	Node* current_node = root;
@@ -232,6 +257,7 @@ int depth_of_min(Node* root) {
 }
 
 void print_status(Status state) {
+	/* Process functions statuses and print proper respose */
 	switch(state) {
 		case 0:
 			break;
@@ -259,20 +285,32 @@ int main(void) {
 	int user_input = 0;
 	while (1) {
 		printf("You can interact with tree via using this numbers:\n1 - add   2 - remove   3 - display tree   4 - display node   5 - find   6 - is empty?   7 - destroy   8 - exit\n");
-		scanf("%d", &user_input);
+		if (scanf("%d", &user_input) != 1) {
+			clear_input_buffer();
+			printf("Incorrect input!\n");
+			continue;
+		}
 		clear_input_buffer();
 		int key, value;
 		switch (user_input) {
 			case 1:
 				printf("Input key and value of your node: ");
-				scanf("%d %d", &key, &value);
+				if (scanf("%d %d", &key, &value) != 2) {
+					clear_input_buffer();
+					printf("Incorrect input!\n");
+					continue;
+				}
 				clear_input_buffer();
 				Status add_status = add_node(&Tree, key, value);
 				print_status(add_status);
 				break;
 			case 2:
 				printf("Input key of the node you want to delete: ");
-                scanf("%d", &key);
+                if (scanf("%d", &key) != 1) {
+                	clear_input_buffer();
+					printf("Incorrect input!\n");
+					continue;
+                }
                 clear_input_buffer();
                 Status remove_status = remove_node(&Tree, key);
                 print_status(remove_status);
@@ -282,7 +320,11 @@ int main(void) {
 				break;
 			case 4:
 				printf("Input key of the node you want to display: ");
-                scanf("%d", &key);
+                if (scanf("%d", &key) != 1) {
+                	clear_input_buffer();
+					printf("Incorrect input!\n");
+					continue;
+                }
                 clear_input_buffer();
                 Status display_node_status = display_node(Tree, key);
                 print_status(display_node_status);
