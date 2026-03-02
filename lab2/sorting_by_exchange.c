@@ -1,0 +1,188 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define SUCCESS 0
+#define FILE_READING_ERROR 1
+#define INPUT_ERROR 2
+#define MAMORY_ERROR 3
+
+#define MAX_LETTERS 11
+#define MAX_KEY_LENGTH 21
+#define MAX_NUMBER (0u - 1u)
+
+typedef struct Key {
+	int number;
+	char letters[MAX_LETTERS];
+} Key;
+
+typedef struct Table {
+	Key* keys;
+	char** data;
+	unsigned int* indexes;
+	unsigned int size;
+} Table;
+
+Table* read_table(void) {
+	/* Initialize a table and fill with data from file. Return pointer to it. */
+	char c;
+	// Open file
+	FILE* file = fopen("/home/ix/repositories/algorithms_and_DS/lab2/test_data.txt", "r");
+
+	if (file == NULL) {
+		printf("Cannot open file.\n");
+		return NULL;
+	}
+
+	// Allocate memory for the table
+	unsigned int size = 0;
+    unsigned int capacity = 17;
+
+    Table* table = malloc(sizeof(Table));
+    if (!table) {
+        fclose(file);
+        return NULL;
+    }
+
+    table->keys = malloc(sizeof(Key) * capacity);
+    table->data = malloc(sizeof(char*) * capacity);
+    table->indexes = (unsigned int*)malloc(sizeof(unsigned int) * capacity);
+    table->size = 0;
+
+    if (!table->keys || !table->data || !table->indexes) {
+        fclose(file); free(table->keys); free(table->data);
+        free(table->indexes); free(table); return NULL;
+    }
+
+    // Process file
+    while (1) {
+
+    	// Read key
+        char key_buffer[MAX_KEY_LENGTH];
+        if (fscanf(file, "%20s", key_buffer) != 1)
+            break;
+
+        // Extend array in two times if it is full
+        if (size == capacity) {
+            capacity *= 2;
+
+            Key* new_keys = realloc(table->keys, sizeof(Key) * capacity);
+            char** new_data = realloc(table->data, sizeof(char*) * capacity);
+            unsigned int* new_indexes 
+            = (unsigned int*)realloc(table->indexes, sizeof(unsigned int) * capacity);
+
+            if (!new_keys || !new_data || !new_indexes) {
+                fclose(file); 
+                return NULL;
+            }
+
+            table->keys = new_keys;
+            table->data = new_data;
+            table->indexes = new_indexes;
+        }
+
+        // Split digits and letters
+        unsigned int j = 0;
+        while (isdigit(key_buffer[j])) j++;
+
+        char number_part[11];
+        strncpy(number_part, key_buffer, j);
+        number_part[j] = '\0';
+
+        table->keys[size].number = atoi(number_part);
+        strcpy(table->keys[size].letters, key_buffer + j);
+
+        table->indexes[size] = size;
+
+        // Skip space
+        fgetc(file);
+
+        // Dinamically read data from file
+        unsigned int data_capacity = 32;
+        unsigned int len = 0;
+        table->data[size] = malloc(data_capacity);
+        if (!table->data[size]) { fclose(file); return NULL; }
+
+        int ch;
+        while ((ch = fgetc(file)) != '\n' && ch != EOF) {
+            if (len + 1 >= data_capacity) {
+                data_capacity *= 2;
+                char* temp = realloc(table->data[size], data_capacity);
+                if (!temp) { fclose(file); return NULL; }
+                table->data[size] = temp;
+            }
+            table->data[size][len++] = (char)ch;
+        }
+
+        table->data[size][len] = '\0';
+
+        size++;
+    }
+
+    table->size = size;
+
+    fclose(file);
+    return table;
+}
+
+int number_length(unsigned int number) {
+    if (number == 0) return 0;
+    int count = 0;
+    while (number > 0) {
+        number /= 10;
+        count++;
+    }
+    return count;
+}
+
+
+int print_table(Table* table) {
+	/* Display table to the terminal */
+	if (!table) return INPUT_ERROR;
+
+	int counter = 0;
+	printf("||Current Table State||\n");
+	for (int i = 0; i < table->size; i++) {
+		// Dispay indexe
+		printf("%3d ", i);
+
+		// Display key
+		printf("%d", table->keys[table->indexes[i]].number);
+		int j = 0;
+		counter = 0;
+		while (table->keys[table->indexes[i]].letters[j] != '\0') {
+			putchar(table->keys[table->indexes[i]].letters[j]);
+			j++;
+			counter++;
+		}
+		// Allign key 
+        // Better to use 21 here
+		int remaining_length = 11 
+			- strlen(table->keys[table->indexes[i]].letters) 
+			- number_length(table->keys[table->indexes[i]].number);
+		for (int i = 0; i < remaining_length; i++) putchar(' ');
+	
+		putchar(' ');
+		int k = 0;
+		while (table->data[i][k] != '\0') {
+			putchar(table->data[i][k]);
+			k++;
+		}
+		putchar('\n');
+	}
+	printf("||        End        ||\n");
+	return SUCCESS;
+}
+
+void sort_table(Table* table) {}
+
+void search_table(Table* table, unsigned int value) {}
+
+void process_status(int stutus) {}
+
+int main(void) {
+	Table* table = read_table();
+    print_table(table);
+	return 0;
+}
