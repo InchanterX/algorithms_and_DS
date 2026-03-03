@@ -289,6 +289,9 @@ int main(void) {
         return FILE_READING_ERROR;
     }
 
+    printf("\n=== NOT SORTED ===\n");
+    print_table(table);
+
     printf("\n=== SORTED BY KEYS ===\n");
     sort_table_by_keys(table);
     print_table(table);
