@@ -7,6 +7,7 @@
 #define FILE_READING_ERROR 1
 #define INPUT_ERROR 2
 #define MAMORY_ERROR 3
+#define PROHIBITED_VALUE_ERROR 4
 
 #define MAX_LETTERS 11
 #define MAX_KEY_LENGTH 21
@@ -120,6 +121,12 @@ Table* read_table(void) {
         size++;
     }
 
+    if (size < 17) {
+        free(table->indexes); free(table->keys); free(table->data);
+        free(table); fclose(file); return NULL; 
+    }
+
+
     table->size = size;
 
     fclose(file);
@@ -136,7 +143,6 @@ int number_length(unsigned int number) {
     return count;
 }
 
-
 int print_table(Table* table) {
 	/* Display table to the terminal */
 	if (!table) return INPUT_ERROR;
@@ -145,7 +151,7 @@ int print_table(Table* table) {
 	printf("||Current Table State||\n");
 	for (int i = 0; i < table->size; i++) {
 		// Dispay indexe
-		printf("%3d ", i);
+		printf("%3d ", table->indexes[i]);
 
 		// Display key
 		printf("%d", table->keys[table->indexes[i]].number);
@@ -165,8 +171,8 @@ int print_table(Table* table) {
 	
 		putchar(' ');
 		int k = 0;
-		while (table->data[i][k] != '\0') {
-			putchar(table->data[i][k]);
+		while (table->data[table->indexes[i]][k] != '\0') {
+			putchar(table->data[table->indexes[i]][k]);
 			k++;
 		}
 		putchar('\n');
@@ -175,14 +181,73 @@ int print_table(Table* table) {
 	return SUCCESS;
 }
 
-void sort_table(Table* table) {}
+int compare_keys(Key key1, Key key2) {
+    if (key1.number < key2.number) return -1;
+    if (key1.number > key2.number) return 1;
+    return strcmp(key1.letters, key2.letters);
+}
+
+void sort_table_by_keys(Table* table) {
+    for (unsigned int i = 0; i < table->size - 1; i++) {
+        unsigned int index_min = i;
+
+        for (unsigned int j = i + 1; j < table->size; j++) {
+            if (compare_keys(table->keys[table->indexes[index_min]], table->keys[table->indexes[j]]) > 0) {
+                index_min = j;
+            }
+        }
+
+        unsigned int buffer = table->indexes[i];
+        table->indexes[i] = table->indexes[index_min];
+        table->indexes[index_min] = buffer;
+    }
+}
+
+void sort_table_by_data(Table* table) {
+    for (unsigned int i = 0; i < table->size - 1; i++) {
+        unsigned int index_min = i;
+
+        for (unsigned int j = i + 1; j < table->size; j++) {
+            if (strcmp(table->data[table->indexes[index_min]], table->data[table->indexes[j]]) > 0) {
+                index_min = j;
+            }
+        }
+        unsigned int buffer = table->indexes[i];
+        table->indexes[i] = table->indexes[index_min];
+        table->indexes[index_min] = buffer;
+    }
+}
 
 void search_table(Table* table, unsigned int value) {}
 
-void process_status(int stutus) {}
+void process_status(int status) {
+    /* Process functions statuses and print proper respose */
+    switch(status) {
+        case 0:
+            break;
+        case 1:
+            printf("Failed to open or read the file with data!\n");
+            break;
+        case 2:
+            printf("Incorrect function input!\n");
+            break;
+        case 3:
+            printf("Failed to allocate memory!\n");
+            break;
+        case 4:
+            printf("Prohibited value was given!\n");
+            break;
+        default:
+            printf("Unknown error, contact the developer!\n");
+    }
+}
 
 int main(void) {
 	Table* table = read_table();
+    print_table(table);
+    sort_table_by_data(table);
+    print_table(table);
+    sort_table_by_keys(table);
     print_table(table);
 	return 0;
 }
