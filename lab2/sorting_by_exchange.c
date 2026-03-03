@@ -182,6 +182,8 @@ int print_table(Table* table) {
 }
 
 int compare_keys(Key key1, Key key2) {
+    /* Return 0 if keys are equal,
+    -1 if key1 < key2 and 1 if key1 > key2 */
     if (key1.number < key2.number) return -1;
     if (key1.number > key2.number) return 1;
     return strcmp(key1.letters, key2.letters);
@@ -218,7 +220,45 @@ void sort_table_by_data(Table* table) {
     }
 }
 
-void search_table(Table* table, unsigned int value) {}
+Key convert_to_key(char* key) {
+    Key new_key;
+    unsigned int j = 0;
+    while (isdigit(key[j])) j++;
+
+    char number_part[11];
+    strncpy(number_part, key, j);
+    number_part[j] = '\0';
+
+    new_key.number = atoi(number_part);
+    strcpy(new_key.letters, key + j);
+
+    return new_key;
+}
+
+char* search_table(Table* table, char* key_row) {
+    Key key = convert_to_key(key_row);
+    unsigned int low = 0;
+    unsigned int high = table->size - 1;
+
+    while (low <= high) {
+        unsigned int middle = (low + high) / 2;
+        unsigned int guess_element_index = table->indexes[middle];
+        if (compare_keys(table->keys[guess_element_index], key) == 0) {
+            return table->data[guess_element_index];
+        } else if (compare_keys(table->keys[guess_element_index], key) > 0) {
+            high = middle - 1;
+        } else {
+            low = middle + 1;
+        }
+    }
+    return NULL;
+}
+
+void clear_input_buffer(void) {
+    /* Consume all extra inputed symbols */
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
 void process_status(int status) {
     /* Process functions statuses and print proper respose */
@@ -243,11 +283,75 @@ void process_status(int status) {
 }
 
 int main(void) {
-	Table* table = read_table();
-    print_table(table);
-    sort_table_by_data(table);
-    print_table(table);
+    Table* table = read_table();
+    if (!table) {
+        process_status(FILE_READING_ERROR);
+        return FILE_READING_ERROR;
+    }
+
+    printf("\n=== SORTED BY KEYS ===\n");
     sort_table_by_keys(table);
     print_table(table);
-	return 0;
+
+    char input[MAX_KEY_LENGTH];
+
+    while (1) {
+        printf("\nInput key (example: 102AB) or -1 to exit: ");
+
+        if (!fgets(input, sizeof(input), stdin)) {
+            printf("Input error.\n");
+            continue;
+        }
+
+        input[strcspn(input, "\n")] = '\0';
+
+        if (strcmp(input, "-1") == 0) {
+            printf("Exiting...\n");
+            break;
+        }
+
+        if (strlen(input) == 0 || strlen(input) > 20) {
+            printf("Invalid key length.\n");
+            continue;
+        }
+
+        unsigned int i = 0;
+
+        if (!isdigit(input[i])) {
+            printf("Key must start with digits.\n");
+            continue;
+        }
+
+        while (isdigit(input[i])) i++;
+
+        if (i == 0) {
+            printf("Key must contain numeric part.\n");
+            continue;
+        }
+
+        if (input[i] == '\0') {
+            printf("Key must contain letter part.\n");
+            continue;
+        }
+
+        while (input[i]) {
+            if (!isalpha(input[i])) {
+                printf("Letters part must contain only alphabetic symbols.\n");
+                break;
+            }
+            i++;
+        }
+
+        if (input[i] != '\0')
+            continue;
+
+        char* result = search_table(table, input);
+
+        if (!result) {
+            printf("Key not found.\n");
+        } else {
+            printf("Found: %s\n", result);
+        }
+    }
+    return SUCCESS;
 }
