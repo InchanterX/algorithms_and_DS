@@ -22,6 +22,6 @@ int stack_is_empty(const DStack *s);
 int stack_is_full(const DStack *s);
 int stack_push(DStack *s, char value);
 int stack_pop(DStack* s, char* value);
-int stack_top(const DStack *s, char *value);
+int stack_top(const DStack *s, char* value);
 
 #endif
