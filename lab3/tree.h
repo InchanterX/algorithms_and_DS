@@ -3,16 +3,11 @@
 #include <stddef.h>
 
 typedef enum {
-	SUCCESS,
-	ALREADY_EXIST,
-	DO_NOT_EXIST,
-	MEMORY_ERROR,
-	INCORRECT_KEY
-} Status;
+	SUCCESS_TREE
+} Status_Tree;
 
 typedef struct Node {
-	int key;
-	int value;
+	char value;
 	struct Node* left;
 	struct Node* right;
 } Node;

@@ -2,13 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef enum {
-	SUCCESS,
-	ALREADY_EXIST,
-	DO_NOT_EXIST,
-	MEMORY_ERROR,
-	INCORRECT_KEY
-} Status;
+// typedef enum {
+// 	SUCCESS_TREE
+// } Status_Tree;
 
 void node_init(Node** Tree) {
 	/* Tree initialization */
@@ -31,17 +27,17 @@ Node* node_create(int value) {
 int node_display(Node* root, unsigned int indent) {
 	/*Display tree elements*/
 	if (root == NULL) {
-		return SUCCESS;
+		return SUCCESS_TREE;
 	}
 	for (int i = 0; i < indent; i++) {
 		printf("   |");
 	}
-	printf("%d (%d)\n", root->key, root->value);
+	printf("%c\n", root->value);
 	if (root->left) {
-		display(root->left, indent + 1);
+		node_display(root->left, indent + 1);
 	}
 	if (root->right) {
-		display(root->right, indent + 1);
+		node_display(root->right, indent + 1);
 	}
-	return SUCCESS;
+	return SUCCESS_TREE;
 }

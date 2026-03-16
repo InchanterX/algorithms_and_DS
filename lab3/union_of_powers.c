@@ -41,8 +41,8 @@ int priority(char sign) {
 char* convert_to_polin(char* str) {
 	char* result = (char*)malloc((MAX_INPUT_SIZE + 1) * sizeof(char));
 	if (!result) return NULL;
-	DStack buffer;
-	stack_init(&buffer, STACK_BASE_SIZE);
+	CharStack buffer;
+	char_stack_init(&buffer, STACK_BASE_SIZE);
 
 	int i = 0;
 	int ri = 0;
@@ -59,33 +59,33 @@ char* convert_to_polin(char* str) {
 			ri++;
 		} else {
 			if (str[i] == '(') {
-				stack_push(&buffer, str[i]);
+				char_stack_push(&buffer, str[i]);
 			} else if (str[i] == ')') {
-				while (!stack_is_empty(&buffer)) {
-					stack_pop(&buffer, &output);
+				while (!char_stack_is_empty(&buffer)) {
+					char_stack_pop(&buffer, &output);
 					if (output == '(') break;
 					result[ri++] = output;
 				}
 			}
-			else if (!stack_is_empty(&buffer)) {
+			else if (!char_stack_is_empty(&buffer)) {
 				char top;
-				stack_top(&buffer, &top);
+				char_stack_top(&buffer, &top);
 				
-				while (!stack_is_empty(&buffer) && top != '(' && priority(str[i]) <= priority(top)) {	
-					stack_pop(&buffer, &output);
+				while (!char_stack_is_empty(&buffer) && top != '(' && priority(str[i]) <= priority(top)) {	
+					char_stack_pop(&buffer, &output);
 					result[ri++] = output;
-					if (!stack_is_empty(&buffer)) stack_top(&buffer, &top);
+					if (!char_stack_is_empty(&buffer)) char_stack_top(&buffer, &top);
 					else top = '\0';
 				}
-				stack_push(&buffer, str[i]);
+				char_stack_push(&buffer, str[i]);
 			} else {
-				stack_push(&buffer, str[i]);
+				char_stack_push(&buffer, str[i]);
 			}
 		}
 		i++;
 	}
-	while (!stack_is_empty(&buffer)) {
-		stack_pop(&buffer, &output);
+	while (!char_stack_is_empty(&buffer)) {
+		char_stack_pop(&buffer, &output);
 		if (output != '(') result[ri++] = output;
 	}
 	result[ri] = '\0';
@@ -93,8 +93,8 @@ char* convert_to_polin(char* str) {
 }
 
 Node* build_tree(char* str) {
-	DStack nodes;
-	stack_init(&nodes, MAX_INPUT_SIZE);
+	NodeStack nodes;
+	node_stack_init(&nodes, MAX_INPUT_SIZE);
 
 	Node* output;
 	int i = 0;
@@ -105,19 +105,19 @@ Node* build_tree(char* str) {
 			|| str[i] == '+' 
 			|| str[i] == '-' )) {
 			Node* parent_node = node_create(str[i]);
-			stack_pop(&nodes, output);
+			node_stack_pop(&nodes, &output);
 			Node* right_node = output;
-			stack_pop(&nodes, &output);
+			node_stack_pop(&nodes, &output);
 			Node* left_node = output;
 			parent_node->right = right_node;
 			parent_node->left = left_node;
-			stack_push(&nodes, parent_node);
+			node_stack_push(&nodes, parent_node);
 		} else {
 			Node* node = node_create(str[i]);
-			stack_push(&nodes, node);
+			node_stack_push(&nodes, node);
 		}
 	}
-	stack_pop(&nodes, output);
+	node_stack_pop(&nodes, &output);
 	return output;
 }
 
@@ -128,6 +128,6 @@ int main(void) {
 	char* result = convert_to_polin(input);
 	print_expression(result);
 	Node* tree_root = build_tree(result);
-	node_display(&tree_root, 4);
+	node_display(tree_root, 4);
 	return 0;
 }
