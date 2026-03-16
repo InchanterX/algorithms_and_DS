@@ -14,7 +14,7 @@ char* input_expression(void) {
 	int i = 0;
 	while (((c = getchar()) != '\n') && (i < MAX_INPUT_SIZE)) {
 		if (c != ' ' && c != '\t') {
-			result[i++] = c;;
+			result[i++] = c;
 		}
 	}
 	result[i] = '\0';
@@ -142,18 +142,70 @@ void tree_simplification(Node* root) {
 	if (root->left) tree_simplification(root->left);
 	if (root->right) tree_simplification(root->right);
 
-	if ((root->value == '*') && root->left && root->right 
-		&& ((root->left->value == '^') && (root->right->value == '^'))
-		&& (root->left->left->value == root->right->left->value)) {
+	int changed = 1;
+
+	while (changed) {
+		changed = 0;
+
+		if ((root->value == '*') && root->left && root->right 
+			&& (root->left->value == '^') && (root->right->value == '^')
+			&& (root->left->left->value == root->right->left->value)) {
+
+			Node* old_left = root->left;
+
+			root->value = '^';
+			root->right->value = '+';
+			root->right->left = old_left->right;
+			root->left = old_left->left;
+
+			free(old_left);
+
+			changed = 1;
+		}
+
+		if ((root->value == '*') && root->left && root->right
+			&& (root->left->value == '*')
+			&& (root->right->value == '^')
+			&& (root->left->right->value == '^')
+			&& (root->left->right->left->value == root->right->left->value)) {
+
+			Node* pow1 = root->left->right;
+			Node* pow2 = root->right;
+
+			Node* new_plus = node_create('+');
+			new_plus->left = pow1->right;
+			new_plus->right = pow2->right;
+
+			pow1->right = new_plus;
+
+			root->right = pow1;
+			root->left = root->left->left;
+
+			free(pow2);
+
+			changed = 1;
+		}
+
+		if ((root->value == '*') && root->left && root->right
+			&& (root->left->value == '*')
+			&& (root->left->left->value == '^')
+			&& (root->right->value == '^')
+			&& (root->left->left->left->value == root->right->left->value)) {
+
+			Node* a = root->left->left;
+			Node* b = root->left->right;
+			Node* c = root->right;
+
+			root->left->right = c;
+			root->right = b;
+
+			changed = 1;
+		}
 		
-		root->value = '^';
-		root->right->value = '+';
-		root->right->left = root->left->right;
-		root->left = root->left->left;
-		root->left->left = NULL;
-		free(root->left->left);
-		root->left->right = NULL;
-		free(root->left->right);
+		if (changed) {
+			if (root->left) tree_simplification(root->left);
+			if (root->right) tree_simplification(root->right);
+		}
 	}
 }
 
@@ -174,7 +226,7 @@ void build_result(Node* root, char* result) {
 	if (root->left) build_result(root->left, result);
 	result[i++] = root->value;
 	if (root->right) {
-		if (is_sign(root->right->value) && (priority(root->value) >priority(root->right->value))) {
+		if (is_sign(root->right->value) && (priority(root->value) > priority(root->right->value))) {
 			result[i++] = '(';
 			build_result(root->right, result);
 			result[i++] = ')';
