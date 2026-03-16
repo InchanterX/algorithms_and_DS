@@ -93,32 +93,97 @@ char* convert_to_polin(char* str) {
 }
 
 Node* build_tree(char* str) {
-	NodeStack nodes;
-	node_stack_init(&nodes, MAX_INPUT_SIZE);
+    NodeStack nodes;
+    node_stack_init(&nodes, MAX_INPUT_SIZE);
 
-	Node* output;
-	int i = 0;
-	while (str[i] != '\0') {
-		if (!(str[i] == '^' 
-			|| str[i] == '*' 
-			|| str[i] == '/' 
-			|| str[i] == '+' 
-			|| str[i] == '-' )) {
-			Node* parent_node = node_create(str[i]);
-			node_stack_pop(&nodes, &output);
-			Node* right_node = output;
-			node_stack_pop(&nodes, &output);
-			Node* left_node = output;
-			parent_node->right = right_node;
-			parent_node->left = left_node;
-			node_stack_push(&nodes, parent_node);
-		} else {
-			Node* node = node_create(str[i]);
-			node_stack_push(&nodes, node);
+    int i = 0;
+    while (str[i] != '\0') {
+        if (str[i] == '^' || str[i] == '*' || str[i] == '/' 
+            || str[i] == '+' || str[i] == '-') {
+            
+            Node* operator_node = node_create(str[i]);
+            Node* right_operand = NULL;
+            Node* left_operand = NULL;
+            
+            if (node_stack_pop(&nodes, &right_operand) != STACK_OK) {
+                node_stack_free(&nodes);
+                return NULL;
+            }
+            
+            if (node_stack_pop(&nodes, &left_operand) != STACK_OK) {
+                node_stack_free(&nodes);
+                return NULL;
+            }
+
+            operator_node->left = left_operand;
+            operator_node->right = right_operand;
+            node_stack_push(&nodes, operator_node);
+        } 
+        else {
+            Node* operand_node = node_create(str[i]);
+            node_stack_push(&nodes, operand_node);
+        }
+        i++;
+    }
+    
+    Node* root = NULL;
+    if (node_stack_pop(&nodes, &root) != STACK_OK) {
+        node_stack_free(&nodes);
+        return NULL;
+    }
+    
+    node_stack_free(&nodes);
+    return root;
+}
+
+void tree_simplification(Node* root) {
+	if (!root) return;
+
+	if (root->left) tree_simplification(root->left);
+	if (root->right) tree_simplification(root->right);
+
+	if ((root->value == '*') && root->left && root->right 
+		&& ((root->left->value == '^') && (root->right->value == '^'))
+		&& (root->left->left->value == root->right->left->value)) {
+		
+		root->value = '^';
+		root->right->value = '+';
+		root->right->left = root->left->right;
+		root->left = root->left->left;
+		root->left->left = NULL;
+		free(root->left->left);
+		root->left->right = NULL;
+		free(root->left->right);
+	}
+}
+
+int is_sign(char value) {
+	if (value == '*' || value == '/' || value == '+' || value == '-' || value == '^') return 1;
+	return 0;
+}
+
+void build_result(Node* root, char* result) {
+	if (!result) return;
+	static int i = 0;
+
+	if (!root->left || !root->right) {
+		result[i++] = root->value; 
+		return;
+	}
+	
+	if (root->left) build_result(root->left, result);
+	result[i++] = root->value;
+	if (root->right) {
+		if (is_sign(root->right->value) && (priority(root->value) >priority(root->right->value))) {
+			result[i++] = '(';
+			build_result(root->right, result);
+			result[i++] = ')';
+		} else { 
+			build_result(root->right, result);
 		}
 	}
-	node_stack_pop(&nodes, &output);
-	return output;
+
+	result[i] = '\0'; 
 }
 
 int main(void) {
@@ -128,6 +193,12 @@ int main(void) {
 	char* result = convert_to_polin(input);
 	print_expression(result);
 	Node* tree_root = build_tree(result);
-	node_display(tree_root, 4);
+	node_display(tree_root, 0);
+	tree_simplification(tree_root);
+	node_display(tree_root, 0);
+	char* final_result = (char*)malloc((MAX_INPUT_SIZE + 1) * sizeof(char));
+	if (!final_result) return 1;
+	build_result(tree_root, final_result);
+	print_expression(final_result);
 	return 0;
 }
