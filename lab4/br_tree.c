@@ -125,16 +125,15 @@ void right_rotate(Node **root, Node *added_node)
     if (!buffer)
         return;
 
-    Node *father = added_node->parent;
-    Node *grandfather = father ? father->parent : NULL;
+    Node *parent = added_node->parent;
 
-    buffer->parent = grandfather;
-    if (grandfather)
+    buffer->parent = parent;
+    if (parent)
     {
-        if (grandfather->left == added_node)
-            grandfather->left = buffer;
+        if (parent->left == added_node)
+            parent->left = buffer;
         else
-            grandfather->right = buffer;
+            parent->right = buffer;
     }
     else
     {
@@ -160,16 +159,15 @@ void left_rotate(Node **root, Node *added_node)
     if (!buffer)
         return;
 
-    Node *father = added_node->parent;
-    Node *grandfather = father ? father->parent : NULL;
+    Node *parent = added_node->parent;
 
-    buffer->parent = grandfather;
-    if (grandfather)
+    buffer->parent = parent;
+    if (parent)
     {
-        if (grandfather->left == added_node)
-            grandfather->left = buffer;
+        if (parent->left == added_node)
+            parent->left = buffer;
         else
-            grandfather->right = buffer;
+            parent->right = buffer;
     }
     else
     {
@@ -292,10 +290,6 @@ Status add(Node **root, const char *key, float value)
     {
         previous->left = new_node;
     }
-    printf("!!!!!!!\n");
-    print_tree(*root);
-    printf("!!!!!!!\n");
-
     balance_tree(root, new_node);
     return SUCCESS;
 }
@@ -660,10 +654,6 @@ void process_commands_from_file_to_file(Node **root, const char *in_filename, co
                 {
                     printf("Added: %s\n", key);
                     fprintf(out_fp, "Added: %s\n\n", key);
-                    print_tree(*root);
-                    print_tree_to_file(*root, out_fp);
-                    fprintf(out_fp, "\n");
-                    printf("--------\n");
                 }
                 else if (st == ALREADY_EXIST)
                 {
