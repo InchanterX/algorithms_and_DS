@@ -1,0 +1,416 @@
+=== Command processing started ===
+1 aplexy 5.6
+Added: aplexy
+
+
+Tree:
+aplexy (B)
+
+
+1 banaza 3.2
+Added: banaza
+
+
+Tree:
+aplexy (B)
+    R:banaza (R) (parent: aplexy)
+
+
+1 cheryz 7.8
+Added: cheryz
+
+
+Tree:
+banaza (B)
+    L:aplexy (R) (parent: banaza)
+    R:cheryz (R) (parent: banaza)
+
+
+1 datemz 2.1
+Added: datemz
+
+
+Tree:
+banaza (B)
+    L:aplexy (B) (parent: banaza)
+    R:cheryz (B) (parent: banaza)
+        R:datemz (R) (parent: cheryz)
+
+
+1 eldery 9.4
+Added: eldery
+
+
+Tree:
+datemz (B)
+    L:cheryz (R) (parent: datemz)
+    R:eldery (R) (parent: datemz)
+
+
+1 figxyz 4.3
+Added: figxyz
+
+
+Tree:
+datemz (B)
+    L:cheryz (B) (parent: datemz)
+    R:eldery (B) (parent: datemz)
+        R:figxyz (R) (parent: eldery)
+
+
+1 grapez 6.7
+Added: grapez
+
+
+Tree:
+figxyz (B)
+    L:eldery (R) (parent: figxyz)
+    R:grapez (R) (parent: figxyz)
+
+
+1 honeyz 1.5
+Added: honeyz
+
+
+Tree:
+figxyz (B)
+    L:eldery (B) (parent: figxyz)
+    R:grapez (B) (parent: figxyz)
+        R:honeyz (R) (parent: grapez)
+
+
+1 icebrg 8.9
+Added: icebrg
+
+
+Tree:
+honeyz (B)
+    L:grapez (R) (parent: honeyz)
+    R:icebrg (R) (parent: honeyz)
+
+
+1 jackfz 3.6
+Added: jackfz
+
+
+Tree:
+honeyz (B)
+    L:grapez (B) (parent: honeyz)
+    R:icebrg (B) (parent: honeyz)
+        R:jackfz (R) (parent: icebrg)
+
+
+1 kiwixy 7.2
+Added: kiwixy
+
+
+Tree:
+jackfz (B)
+    L:icebrg (R) (parent: jackfz)
+    R:kiwixy (R) (parent: jackfz)
+
+
+1 lemonz 2.8
+Added: lemonz
+
+
+Tree:
+jackfz (B)
+    L:icebrg (B) (parent: jackfz)
+    R:kiwixy (B) (parent: jackfz)
+        R:lemonz (R) (parent: kiwixy)
+
+
+1 mangoz 9.1
+Added: mangoz
+
+
+Tree:
+lemonz (B)
+    L:kiwixy (R) (parent: lemonz)
+    R:mangoz (R) (parent: lemonz)
+
+
+1 nectar 5.4
+Added: nectar
+
+
+Tree:
+lemonz (B)
+    L:kiwixy (B) (parent: lemonz)
+    R:mangoz (B) (parent: lemonz)
+        R:nectar (R) (parent: mangoz)
+
+
+1 olivex 4.7
+Added: olivex
+
+
+Tree:
+nectar (B)
+    L:mangoz (R) (parent: nectar)
+    R:olivex (R) (parent: nectar)
+
+
+1 papayz 6.3
+Added: papayz
+
+
+Tree:
+nectar (B)
+    L:mangoz (B) (parent: nectar)
+    R:olivex (B) (parent: nectar)
+        R:papayz (R) (parent: olivex)
+
+
+1 quince 1.9
+Added: quince
+
+
+Tree:
+papayz (B)
+    L:olivex (R) (parent: papayz)
+    R:quince (R) (parent: papayz)
+
+
+1 raspbr 8.5
+Added: raspbr
+
+
+Tree:
+papayz (B)
+    L:olivex (B) (parent: papayz)
+    R:quince (B) (parent: papayz)
+        R:raspbr (R) (parent: quince)
+
+
+1 strawb 3.7
+Added: strawb
+
+
+Tree:
+raspbr (B)
+    L:quince (R) (parent: raspbr)
+    R:strawb (R) (parent: raspbr)
+
+
+1 tanger 7.4
+Added: tanger
+
+
+Tree:
+raspbr (B)
+    L:quince (B) (parent: raspbr)
+    R:strawb (B) (parent: raspbr)
+        R:tanger (R) (parent: strawb)
+
+
+1 ugliiz 2.6
+Added: ugliiz
+
+
+Tree:
+tanger (B)
+    L:strawb (R) (parent: tanger)
+    R:ugliiz (R) (parent: tanger)
+
+
+1 vanill 9.8
+Added: vanill
+
+
+Tree:
+tanger (B)
+    L:strawb (B) (parent: tanger)
+    R:ugliiz (B) (parent: tanger)
+        R:vanill (R) (parent: ugliiz)
+
+
+1 waterm 5.1
+Added: waterm
+
+
+Tree:
+vanill (B)
+    L:ugliiz (R) (parent: vanill)
+    R:waterm (R) (parent: vanill)
+
+
+1 xiguaz 4.2
+Added: xiguaz
+
+
+Tree:
+vanill (B)
+    L:ugliiz (B) (parent: vanill)
+    R:waterm (B) (parent: vanill)
+        R:xiguaz (R) (parent: waterm)
+
+
+1 yuzuzy 6.9
+Added: yuzuzy
+
+
+Tree:
+xiguaz (B)
+    L:waterm (R) (parent: xiguaz)
+    R:yuzuzy (R) (parent: xiguaz)
+
+
+3
+
+Tree:
+xiguaz (B)
+    L:waterm (R) (parent: xiguaz)
+    R:yuzuzy (R) (parent: xiguaz)
+
+
+4 aplexy
+Key aplexy not found
+
+4 zzzzzz
+Key zzzzzz not found
+
+2 datemz
+Key datemz not found for deletion
+
+4 datemz
+Key datemz not found
+
+2 cheryz
+Key cheryz not found for deletion
+
+4 cheryz
+Key cheryz not found
+
+2 yuzuzy
+Deleted: yuzuzy
+
+4 yuzuzy
+Key yuzuzy not found
+
+2 kiwixy
+Key kiwixy not found for deletion
+
+4 kiwixy
+Key kiwixy not found
+
+3
+
+Tree:
+xiguaz (B)
+    L:waterm (R) (parent: xiguaz)
+
+
+4 banaza
+Key banaza not found
+
+4 mangoz
+Key mangoz not found
+
+4 papayz
+Key papayz not found
+
+4 strawb
+Key strawb not found
+
+4 waterm
+Found: waterm = 5.10
+
+4 xiguaz
+Found: xiguaz = 4.20
+
+2 eldery
+Key eldery not found for deletion
+
+2 figxyz
+Key figxyz not found for deletion
+
+2 grapez
+Key grapez not found for deletion
+
+2 honeyz
+Key honeyz not found for deletion
+
+2 icebrg
+Key icebrg not found for deletion
+
+2 jackfz
+Key jackfz not found for deletion
+
+2 lemonz
+Key lemonz not found for deletion
+
+2 nectar
+Key nectar not found for deletion
+
+2 olivex
+Key olivex not found for deletion
+
+2 quince
+Key quince not found for deletion
+
+2 raspbr
+Key raspbr not found for deletion
+
+2 tanger
+Key tanger not found for deletion
+
+2 ugliiz
+Key ugliiz not found for deletion
+
+2 vanill
+Key vanill not found for deletion
+
+3
+
+Tree:
+xiguaz (B)
+    L:waterm (R) (parent: xiguaz)
+
+
+1 aplexy 10.5
+Added: aplexy
+
+
+Tree:
+waterm (B)
+    L:aplexy (R) (parent: waterm)
+    R:xiguaz (R) (parent: waterm)
+
+
+1 aplexy 99.9
+Key aplexy already exists
+
+4 aplexy
+Found: aplexy = 10.50
+
+1 zzzzzz 7.0
+Added: zzzzzz
+
+
+Tree:
+waterm (B)
+    L:aplexy (B) (parent: waterm)
+    R:xiguaz (B) (parent: waterm)
+        R:zzzzzz (R) (parent: xiguaz)
+
+
+4 zzzzzz
+Found: zzzzzz = 7.00
+
+2 zzzzzz
+Deleted: zzzzzz
+
+4 zzzzzz
+Key zzzzzz not found
+
+3
+
+Tree:
+waterm (B)
+    L:aplexy (B) (parent: waterm)
+    R:xiguaz (B) (parent: waterm)
+
+
+=== Processing completed ===

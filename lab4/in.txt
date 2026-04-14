@@ -1,0 +1,66 @@
+1 aplexy 5.6
+1 banaza 3.2
+1 cheryz 7.8
+1 datemz 2.1
+1 eldery 9.4
+1 figxyz 4.3
+1 grapez 6.7
+1 honeyz 1.5
+1 icebrg 8.9
+1 jackfz 3.6
+1 kiwixy 7.2
+1 lemonz 2.8
+1 mangoz 9.1
+1 nectar 5.4
+1 olivex 4.7
+1 papayz 6.3
+1 quince 1.9
+1 raspbr 8.5
+1 strawb 3.7
+1 tanger 7.4
+1 ugliiz 2.6
+1 vanill 9.8
+1 waterm 5.1
+1 xiguaz 4.2
+1 yuzuzy 6.9
+3
+4 aplexy
+4 zzzzzz
+2 datemz
+4 datemz
+2 cheryz
+4 cheryz
+2 yuzuzy
+4 yuzuzy
+2 kiwixy
+4 kiwixy
+3
+4 banaza
+4 mangoz
+4 papayz
+4 strawb
+4 waterm
+4 xiguaz
+2 eldery
+2 figxyz
+2 grapez
+2 honeyz
+2 icebrg
+2 jackfz
+2 lemonz
+2 nectar
+2 olivex
+2 quince
+2 raspbr
+2 tanger
+2 ugliiz
+2 vanill
+3
+1 aplexy 10.5
+1 aplexy 99.9
+4 aplexy
+1 zzzzzz 7.0
+4 zzzzzz
+2 zzzzzz
+4 zzzzzz
+3
