@@ -22,35 +22,53 @@ typedef struct Node
 {
     char *key;
     float value;
-    bool color;
+    Color color;
     struct Node *left;
     struct Node *right;
     struct Node *parent;
 
 } Node;
 
+static Node *NIL = NULL;
+
 Node *init_tree(void)
 {
-    Node *tree = NULL;
-    return tree;
+    if (!NIL)
+    {
+        NIL = (Node *)malloc(sizeof(Node));
+        if (!NIL)
+            return NULL;
+        NIL->key = NULL;
+        NIL->value = 0;
+        NIL->color = BLACK;
+        NIL->left = NIL->right = NIL->parent = NIL;
+    }
+    return NULL;
 }
 
 Node *create_node(const char *key, float value, Node *previous)
 {
     Node *new_node = (Node *)malloc(sizeof(Node));
+    if (!new_node)
+        return NULL;
     new_node->key = (char *)malloc(strlen(key) + 1);
+    if (!new_node->key)
+    {
+        free(new_node);
+        return NULL;
+    }
     strcpy(new_node->key, key);
     new_node->value = value;
     new_node->color = RED;
-    new_node->left = NULL;
-    new_node->right = NULL;
+    new_node->left = NIL;
+    new_node->right = NIL;
     new_node->parent = previous;
     return new_node;
 }
 
 void free_node(Node *node)
 {
-    if (node)
+    if (node && node != NIL)
     {
         free(node->key);
         free(node);
@@ -61,17 +79,16 @@ void free_tree(Node *root)
 {
     if (!root)
         return;
-    free_tree(root->left);
-    free_tree(root->right);
+    if (root->left && root->left != NIL)
+        free_tree(root->left);
+    if (root->right && root->right != NIL)
+        free_tree(root->right);
     free_node(root);
 }
 
 bool node_exists(Node *node)
 {
-    if (node)
-        return true;
-    else
-        return false;
+    return node && node != NIL;
 }
 
 int compare_keys(const char *a, const char *b)
@@ -81,23 +98,23 @@ int compare_keys(const char *a, const char *b)
 
 const char *get_color(Node *node)
 {
-    if (!node)
+    if (!node || node == NIL)
         return "";
     return node->color == RED ? "(R)" : "(B)";
 }
 
 void print_tree_recursive(Node *node, int level, const char *prefix)
 {
-    if (!node)
+    if (!node || node == NIL)
         return;
     for (int i = 0; i < level; i++)
         printf("    ");
     printf("%s%s %s", prefix, node->key, get_color(node));
-    if (node->parent)
+    if (node->parent && node->parent != NIL)
         printf(" (parent: %s)", node->parent->key);
     printf("\n");
 
-    if (node->left || node->right)
+    if (node->left != NIL || node->right != NIL)
     {
         print_tree_recursive(node->left, level + 1, "L:");
         print_tree_recursive(node->right, level + 1, "R:");
@@ -118,85 +135,60 @@ void print_tree(Node *root)
 
 void right_rotate(Node **root, Node *added_node)
 {
-    if (!(*root) || !(added_node))
+    if (!added_node || added_node->left == NIL)
         return;
 
     Node *buffer = added_node->left;
-    if (!buffer)
-        return;
+    added_node->left = buffer->right;
+    if (buffer->right != NIL)
+        buffer->right->parent = added_node;
 
-    Node *parent = added_node->parent;
-
-    buffer->parent = parent;
-    if (parent)
-    {
-        if (parent->left == added_node)
-            parent->left = buffer;
-        else
-            parent->right = buffer;
-    }
-    else
+    buffer->parent = added_node->parent;
+    if (added_node->parent == NIL || added_node->parent == NULL)
     {
         *root = buffer;
     }
-
-    Node *temp = buffer->right;
+    else if (added_node == added_node->parent->right)
+        added_node->parent->right = buffer;
+    else
+        added_node->parent->left = buffer;
 
     buffer->right = added_node;
     added_node->parent = buffer;
-
-    added_node->left = temp;
-    if (temp)
-        temp->parent = added_node;
 }
 
 void left_rotate(Node **root, Node *added_node)
 {
-    if (!(*root) || !(added_node))
+    if (!added_node || added_node->right == NIL)
         return;
 
     Node *buffer = added_node->right;
-    if (!buffer)
-        return;
+    added_node->right = buffer->left;
+    if (buffer->left != NIL)
+        buffer->left->parent = added_node;
 
-    Node *parent = added_node->parent;
-
-    buffer->parent = parent;
-    if (parent)
-    {
-        if (parent->left == added_node)
-            parent->left = buffer;
-        else
-            parent->right = buffer;
-    }
-    else
+    buffer->parent = added_node->parent;
+    if (added_node->parent == NIL || added_node->parent == NULL)
     {
         *root = buffer;
     }
-
-    Node *temp = buffer->left;
+    else if (added_node == added_node->parent->left)
+        added_node->parent->left = buffer;
+    else
+        added_node->parent->right = buffer;
 
     buffer->left = added_node;
     added_node->parent = buffer;
-
-    added_node->right = temp;
-    if (temp)
-        temp->parent = added_node;
 }
 
 void balance_tree(Node **root, Node *added_node)
 {
-    if (!(*root) || !(added_node))
-        return;
-    Node *uncle;
-    while (added_node && added_node != *root && added_node->parent && added_node->parent->color == RED)
+    while (added_node->parent && added_node->parent != NIL && added_node->parent->color == RED)
     {
-        if (!added_node->parent->parent)
-            break;
         if (added_node->parent == added_node->parent->parent->left)
         {
-            uncle = added_node->parent->parent->right;
-            if (uncle && uncle->color == RED)
+            Node *uncle = added_node->parent->parent->right;
+            if (uncle && uncle != NIL && uncle->color == RED)
             {
                 added_node->parent->color = BLACK;
                 uncle->color = BLACK;
@@ -205,22 +197,20 @@ void balance_tree(Node **root, Node *added_node)
             }
             else
             {
-                Node *grandfather = added_node->parent->parent;
                 if (added_node == added_node->parent->right)
                 {
                     added_node = added_node->parent;
                     left_rotate(root, added_node);
                 }
                 added_node->parent->color = BLACK;
-                grandfather->color = RED;
-                right_rotate(root, grandfather);
-                break;
+                added_node->parent->parent->color = RED;
+                right_rotate(root, added_node->parent->parent);
             }
         }
         else
         {
-            uncle = added_node->parent->parent->left;
-            if (uncle && uncle->color == RED)
+            Node *uncle = added_node->parent->parent->left;
+            if (uncle && uncle != NIL && uncle->color == RED)
             {
                 added_node->parent->color = BLACK;
                 uncle->color = BLACK;
@@ -229,67 +219,62 @@ void balance_tree(Node **root, Node *added_node)
             }
             else
             {
-                Node *grandfather = added_node->parent->parent;
                 if (added_node == added_node->parent->left)
                 {
                     added_node = added_node->parent;
                     right_rotate(root, added_node);
                 }
                 added_node->parent->color = BLACK;
-                grandfather->color = RED;
-                left_rotate(root, grandfather);
-                break;
+                added_node->parent->parent->color = RED;
+                left_rotate(root, added_node->parent->parent);
             }
         }
     }
-    (*root)->color = BLACK;
+    if (*root)
+        (*root)->color = BLACK;
 }
 
 Status add(Node **root, const char *key, float value)
 {
+    if (!NIL)
+        init_tree();
+
     if (!(*root))
     {
-        *root = create_node(key, value, NULL);
+        *root = create_node(key, value, NIL);
+        if (!*root)
+            return MEMORY_ERROR;
         (*root)->color = BLACK;
         return SUCCESS;
     }
 
     Node *current = *root;
-    Node *previous = NULL;
-    int direction;
-
-    while (current)
+    Node *parent = NIL;
+    while (current != NIL)
     {
         int cmp = strcmp(key, current->key);
         if (cmp == 0)
-        {
             return ALREADY_EXIST;
-        }
-
-        previous = current;
-
+        parent = current;
         if (cmp < 0)
-        {
-            direction = 0;
             current = current->left;
-        }
         else
-        {
-            direction = 1;
             current = current->right;
-        }
     }
 
-    Node *new_node = create_node(key, value, previous);
+    Node *new_node = create_node(key, value, parent);
+    if (!new_node)
+        return MEMORY_ERROR;
 
-    if (direction)
+    if (parent == NIL)
     {
-        previous->right = new_node;
+        *root = new_node;
     }
+    else if (strcmp(key, parent->key) < 0)
+        parent->left = new_node;
     else
-    {
-        previous->left = new_node;
-    }
+        parent->right = new_node;
+
     balance_tree(root, new_node);
     return SUCCESS;
 }
@@ -298,90 +283,79 @@ Node *find(Node *root, const char *key)
 {
     if (!root)
         return NULL;
-    Node *current = root;
-    while (current)
+    Node *cur = root;
+    while (cur != NIL)
     {
-        int cmp = strcmp(key, current->key);
+        int cmp = strcmp(key, cur->key);
         if (cmp == 0)
-        {
-            return current;
-        }
+            return cur;
         else if (cmp < 0)
-        {
-            current = current->left;
-        }
+            cur = cur->left;
         else
-        {
-            current = current->right;
-        }
+            cur = cur->right;
     }
     return NULL;
 }
 
 int get_children_count(Node *node)
 {
-    if (!node)
+    if (!node || node == NIL)
         return 0;
-    int count = 0;
-    if (node_exists(node->left))
-        count += 1;
-    if (node_exists(node->right))
-        count += 1;
-    return count;
+    int cnt = 0;
+    if (node->left != NIL)
+        cnt++;
+    if (node->right != NIL)
+        cnt++;
+    return cnt;
 }
 
 Node *get_child_or_another(Node *node)
 {
-    if (!node)
-        return NULL;
-    if (node->left)
+    if (!node || node == NIL)
+        return NIL;
+    if (node->left != NIL)
         return node->left;
-    if (node->right)
+    if (node->right != NIL)
         return node->right;
-    return NULL;
+    return NIL;
 }
 
 void transit_node(Node **root, Node *destination, Node *origin)
 {
-    if (!(root) || !destination)
+    if (!destination)
         return;
-
-    if (destination->parent)
+    if (destination->parent == NIL || destination->parent == NULL)
     {
-        if (destination == destination->parent->left)
-            destination->parent->left = origin;
-        else
-            destination->parent->right = origin;
+        /* if origin is NIL, set root to NULL */
+        *root = (origin == NIL) ? NULL : origin;
     }
+    else if (destination == destination->parent->left)
+        destination->parent->left = origin;
     else
-    {
-        *root = origin;
-    }
+        destination->parent->right = origin;
 
-    if (origin)
+    if (origin && origin != NIL)
         origin->parent = destination->parent;
 }
 
-Node *get_min(Node *root)
+Node *get_min(Node *node)
 {
-    if (!root)
+    if (!node)
         return NULL;
-
-    while (root->left)
-    {
-        root = root->left;
-    }
-    return root;
+    while (node->left != NIL)
+        node = node->left;
+    return node;
 }
 
 void fix_tree(Node **root, Node *node)
 {
-    while (node != *root && node && node->color == BLACK)
+    while (node && node != *root && node->color == BLACK)
     {
-        Node *brother;
+        if (!node->parent || node->parent == NIL)
+            break;
         if (node == node->parent->left)
         {
-            brother = node->parent->right;
+            Node *brother = node->parent->right;
             if (brother && brother->color == RED)
             {
                 brother->color = BLACK;
@@ -389,7 +363,7 @@ void fix_tree(Node **root, Node *node)
                 left_rotate(root, node->parent);
                 brother = node->parent->right;
             }
-            if (!brother || (!brother->left || brother->left->color == BLACK) && (!brother->right || brother->right->color == BLACK))
+            if ((!brother) || ((brother->left == NIL || brother->left->color == BLACK) && (brother->right == NIL || brother->right->color == BLACK)))
             {
                 if (brother)
                     brother->color = RED;
@@ -397,7 +371,7 @@ void fix_tree(Node **root, Node *node)
             }
             else
             {
-                if (brother && (!brother->right || brother->right->color == BLACK))
+                if (brother->right == NIL || brother->right->color == BLACK)
                 {
                     if (brother->left)
                         brother->left->color = BLACK;
@@ -408,9 +382,8 @@ void fix_tree(Node **root, Node *node)
                 if (brother)
                 {
                     brother->color = node->parent->color;
-                    if (brother->right)
+                    if (brother->right && brother->right != NIL)
                         brother->right->color = BLACK;
-                    brother = node->parent->right;
                 }
                 node->parent->color = BLACK;
                 left_rotate(root, node->parent);
@@ -419,7 +392,7 @@ void fix_tree(Node **root, Node *node)
         }
         else
         {
-            brother = node->parent->left;
+            Node *brother = node->parent->left;
             if (brother && brother->color == RED)
             {
                 brother->color = BLACK;
@@ -427,7 +400,7 @@ void fix_tree(Node **root, Node *node)
                 right_rotate(root, node->parent);
                 brother = node->parent->left;
             }
-            if (!brother || (!brother->left || brother->left->color == BLACK) && (!brother->right || brother->right->color == BLACK))
+            if ((!brother) || ((brother->left == NIL || brother->left->color == BLACK) && (brother->right == NIL || brother->right->color == BLACK)))
             {
                 if (brother)
                     brother->color = RED;
@@ -435,7 +408,7 @@ void fix_tree(Node **root, Node *node)
             }
             else
             {
-                if (brother && (!brother->left || brother->left->color == BLACK))
+                if (brother->left == NIL || brother->left->color == BLACK)
                 {
                     if (brother->right)
                         brother->right->color = BLACK;
@@ -446,9 +419,8 @@ void fix_tree(Node **root, Node *node)
                 if (brother)
                 {
                     brother->color = node->parent->color;
-                    if (brother->left)
+                    if (brother->left && brother->left != NIL)
                         brother->left->color = BLACK;
-                    brother = node->parent->left;
                 }
                 node->parent->color = BLACK;
                 right_rotate(root, node->parent);
@@ -456,44 +428,66 @@ void fix_tree(Node **root, Node *node)
             }
         }
     }
-    if (node)
+    if (node && node != NIL)
         node->color = BLACK;
 }
 
 Status remove_node(Node **root, const char *key)
 {
-    if (!(*root))
+    if (!*root)
         return DO_NOT_EXIST;
-
     Node *node_to_delete = find(*root, key);
     if (!node_to_delete)
         return DO_NOT_EXIST;
 
-    Color remove_node_color = node_to_delete->color;
-    Node *child;
+    Node *successor = node_to_delete;
+    Color successor_original_color = successor->color;
+    Node *replacement;
 
-    if (get_children_count(node_to_delete) < 2)
+    if (node_to_delete->left == NIL)
     {
-        child = get_child_or_another(node_to_delete);
-        transit_node(root, node_to_delete, child);
+        replacement = node_to_delete->right;
+        transit_node(root, node_to_delete, node_to_delete->right);
+    }
+    else if (node_to_delete->right == NIL)
+    {
+        replacement = node_to_delete->left;
+        transit_node(root, node_to_delete, node_to_delete->left);
     }
     else
     {
-        Node *min_node = get_min(node_to_delete->right);
-        free(node_to_delete->key);
-        node_to_delete->key = (char *)malloc(strlen(min_node->key) + 1);
-        strcpy(node_to_delete->key, min_node->key);
-        node_to_delete->value = min_node->value;
-        remove_node_color = min_node->color;
-        child = get_child_or_another(min_node);
-        transit_node(root, min_node, child);
-        node_to_delete = min_node;
+        successor = get_min(node_to_delete->right);
+        successor_original_color = successor->color;
+        replacement = successor->right;
+        if (successor->parent == node_to_delete)
+        {
+            if (replacement && replacement != NIL)
+                replacement->parent = successor;
+        }
+        else
+        {
+            transit_node(root, successor, successor->right);
+            successor->right = node_to_delete->right;
+            if (successor->right && successor->right != NIL)
+                successor->right->parent = successor;
+        }
+        transit_node(root, node_to_delete, successor);
+        successor->left = node_to_delete->left;
+        if (successor->left && successor->left != NIL)
+            successor->left->parent = successor;
+        successor->color = node_to_delete->color;
     }
 
-    if (remove_node_color == BLACK)
-        fix_tree(root, child);
-
     free_node(node_to_delete);
+
+    if (successor_original_color == BLACK)
+    {
+        if (replacement == NULL)
+            fix_tree(root, (successor->parent == NIL) ? NULL : successor->parent);
+        else
+            fix_tree(root, replacement);
+    }
+
     return SUCCESS;
 }
 
@@ -571,18 +565,18 @@ void process_commands_from_file(Node **root, const char *filename)
 
 void print_tree_recursive_file(Node *node, int level, const char *prefix, FILE *fp)
 {
-    if (!node)
+    if (!node || node == NIL)
         return;
 
     for (int i = 0; i < level; i++)
         fprintf(fp, "    ");
 
     fprintf(fp, "%s%s %s", prefix, node->key, node->color == RED ? "(R)" : "(B)");
-    if (node->parent)
+    if (node->parent && node->parent != NIL)
         fprintf(fp, " (parent: %s)", node->parent->key);
     fprintf(fp, "\n");
 
-    if (node->left || node->right)
+    if (node->left != NIL || node->right != NIL)
     {
         print_tree_recursive_file(node->left, level + 1, "L:", fp);
         print_tree_recursive_file(node->right, level + 1, "R:", fp);
@@ -719,7 +713,7 @@ void process_commands_from_file_to_file(Node **root, const char *in_filename, co
             else
             {
                 printf("Format error: expected 4 <key>\n");
-                fprintf(out_fp, "Format error: expected 4 <key>\n\n");
+                fprintf(out_fp, "Format error: expected 4 <key>\n\n", key);
             }
             break;
 
@@ -739,8 +733,13 @@ void process_commands_from_file_to_file(Node **root, const char *in_filename, co
 int main(void)
 {
     Node *tree = init_tree();
-    // process_commands_from_file(&tree, "commands.txt");
     process_commands_from_file_to_file(&tree, "in.txt", "out.txt");
     free_tree(tree);
+    if (NIL)
+    {
+        free(NIL->key);
+        free(NIL);
+        NIL = NULL;
+    }
     return 0;
 }
