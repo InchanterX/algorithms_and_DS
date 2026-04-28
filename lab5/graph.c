@@ -44,6 +44,9 @@ int graph_add_edge(Graph* graph, int value, int destination, int weight) {
         return -1;
     }
 
+    if (value == destination)
+        return INVALID_INPUT;
+
     if (weight <= 0) {
         return -1;
     }

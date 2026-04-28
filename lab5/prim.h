@@ -8,17 +8,17 @@ typedef struct
     int source;
     int destination;
     int weight;
-} MstEdge;
+} Minimum_spanning_treeEdge;
 
 typedef struct
 {
-    MstEdge *edges;
+    Minimum_spanning_treeEdge *edges;
     int count;
     int capacity;
-} MstResult;
+} Minimum_spanning_treeResult;
 
-MstResult *prim_algorithm(Graph *graph);
-void mst_result_destroy(MstResult *result);
-void mst_result_print(MstResult *result);
+Minimum_spanning_treeResult *prim_algorithm(Graph *graph);
+void minimum_spanning_tree_result_destroy(Minimum_spanning_treeResult *result);
+void minimum_spanning_tree_result_print(Minimum_spanning_treeResult *result);
 
 #endif

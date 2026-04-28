@@ -1,21 +1,20 @@
-// prim.c
 #include "prim.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <limits.h>
 #include <stdbool.h>
 
-static void mst_result_init(MstResult *result)
+static void minimum_spanning_tree_result_init(Minimum_spanning_treeResult *result)
 {
     if (!result)
         return;
 
     result->capacity = 10;
     result->count = 0;
-    result->edges = (MstEdge *)malloc(result->capacity * sizeof(MstEdge));
+    result->edges = (Minimum_spanning_treeEdge *)malloc(result->capacity * sizeof(Minimum_spanning_treeEdge));
 }
 
-static void mst_result_add(MstResult *result, int source, int destination, int weight)
+static void minimum_spanning_tree_result_add(Minimum_spanning_treeResult *result, int source, int destination, int weight)
 {
     if (!result)
         return;
@@ -23,7 +22,7 @@ static void mst_result_add(MstResult *result, int source, int destination, int w
     if (result->count >= result->capacity)
     {
         result->capacity *= 2;
-        result->edges = (MstEdge *)realloc(result->edges, result->capacity * sizeof(MstEdge));
+        result->edges = (Minimum_spanning_treeEdge *)realloc(result->edges, result->capacity * sizeof(Minimum_spanning_treeEdge));
     }
 
     result->edges[result->count].source = source;
@@ -32,7 +31,7 @@ static void mst_result_add(MstResult *result, int source, int destination, int w
     result->count++;
 }
 
-MstResult *prim_algorithm(Graph *graph)
+Minimum_spanning_treeResult *prim_algorithm(Graph *graph)
 {
     if (!graph)
         return NULL;
@@ -45,29 +44,39 @@ MstResult *prim_algorithm(Graph *graph)
     if (vertices <= 0)
         return NULL;
 
-    bool *in_mst = (bool *)calloc(vertices, sizeof(bool));
-    if (!in_mst)
+    if (vertices == 1)
+    {
+        Minimum_spanning_treeResult *result = (Minimum_spanning_treeResult *)malloc(sizeof(Minimum_spanning_treeResult));
+        if (!result)
+            return NULL;
+
+        minimum_spanning_tree_result_init(result);
+        return result;
+    }
+
+    bool *in_minimum_spanning_tree = (bool *)calloc(vertices, sizeof(bool));
+    if (!in_minimum_spanning_tree)
         return NULL;
 
-    MstResult *result = (MstResult *)malloc(sizeof(MstResult));
+    Minimum_spanning_treeResult *result = (Minimum_spanning_treeResult *)malloc(sizeof(Minimum_spanning_treeResult));
     if (!result)
     {
-        free(in_mst);
+        free(in_minimum_spanning_tree);
         return NULL;
     }
 
-    mst_result_init(result);
+    minimum_spanning_tree_result_init(result);
     if (!result->edges)
     {
-        free(in_mst);
+        free(in_minimum_spanning_tree);
         free(result);
         return NULL;
     }
 
-    in_mst[0] = true;
-    int edges_in_mst = 0;
+    in_minimum_spanning_tree[0] = true;
+    int edges_in_minimum_spanning_tree = 0;
 
-    while (edges_in_mst < vertices - 1)
+    while (edges_in_minimum_spanning_tree < vertices - 1)
     {
         int min_weight = INT_MAX;
         int min_index = -1;
@@ -81,7 +90,7 @@ MstResult *prim_algorithm(Graph *graph)
             int destination = graph_edge.destination;
             int weight = graph_edge.weight;
 
-            if (in_mst[source] != in_mst[destination] && weight < min_weight)
+            if (in_minimum_spanning_tree[source] != in_minimum_spanning_tree[destination] && weight < min_weight)
             {
                 min_weight = weight;
                 min_index = i;
@@ -93,24 +102,24 @@ MstResult *prim_algorithm(Graph *graph)
         if (min_index == -1)
             break;
 
-        in_mst[min_source] = true;
-        in_mst[min_destination] = true;
-        mst_result_add(result, min_source, min_destination, min_weight);
-        edges_in_mst++;
+        in_minimum_spanning_tree[min_source] = true;
+        in_minimum_spanning_tree[min_destination] = true;
+        minimum_spanning_tree_result_add(result, min_source, min_destination, min_weight);
+        edges_in_minimum_spanning_tree++;
     }
 
-    free(in_mst);
+    free(in_minimum_spanning_tree);
 
-    if (edges_in_mst != vertices - 1)
+    if (edges_in_minimum_spanning_tree != vertices - 1)
     {
-        mst_result_destroy(result);
+        minimum_spanning_tree_result_destroy(result);
         return NULL;
     }
 
     return result;
 }
 
-void mst_result_destroy(MstResult *result)
+void minimum_spanning_tree_result_destroy(Minimum_spanning_treeResult *result)
 {
     if (!result)
         return;
@@ -121,11 +130,11 @@ void mst_result_destroy(MstResult *result)
     free(result);
 }
 
-void mst_result_print(MstResult *result)
+void minimum_spanning_tree_result_print(Minimum_spanning_treeResult *result)
 {
     if (!result)
     {
-        printf("MST result is NULL\n");
+        printf("MINIMUM_SPANNING_TREE result is NULL\n");
         return;
     }
 

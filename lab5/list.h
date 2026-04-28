@@ -30,7 +30,7 @@ int edge_list_set(EdgeList *list, int index, int source, int destination, int we
 int edge_list_size(EdgeList *list);
 int edge_list_clear(EdgeList *list);
 int edge_list_print(EdgeList *list);
-int edge_list_find_cross_edge(EdgeList *list, int *in_mst, int vertices_count);
+int edge_list_find_cross_edge(EdgeList *list, int *in_minimum_spanning_tree, int vertices_count);
 int edge_list_sort_by_weight(EdgeList *list);
 
 #endif

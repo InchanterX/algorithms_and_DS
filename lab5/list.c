@@ -216,9 +216,9 @@ int edge_list_print(EdgeList *list)
     return SUCCESS;
 }
 
-int edge_list_find_cross_edge(EdgeList *list, int *in_mst, int vertices_count)
+int edge_list_find_cross_edge(EdgeList *list, int *in_minimum_spanning_tree, int vertices_count)
 {
-    if (!list || !list->data || !in_mst)
+    if (!list || !list->data || !in_minimum_spanning_tree)
         return -1;
 
     int min_weight = INT_MAX;
@@ -226,13 +226,16 @@ int edge_list_find_cross_edge(EdgeList *list, int *in_mst, int vertices_count)
 
     for (int i = 0; i < list->size; i++)
     {
-        int value = list->data[i].source;
+        int source = list->data[i].source;
         int destination = list->data[i].destination;
         int weight = list->data[i].weight;
 
-        if (value >= 0 && value < vertices_count && destination >= 0 && destination < vertices_count)
+        if (source == destination)
+            continue;
+
+        if (source >= 0 && source < vertices_count && destination >= 0 && destination < vertices_count)
         {
-            if (in_mst[value] != in_mst[destination] && weight < min_weight)
+            if (in_minimum_spanning_tree[source] != in_minimum_spanning_tree[destination] && weight < min_weight)
             {
                 min_weight = weight;
                 min_index = i;
